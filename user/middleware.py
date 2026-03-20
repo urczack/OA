@@ -11,7 +11,7 @@ class JwtAuthticationMiddlewate(MiddlewareMixin):
     def process_request(self, request):
         white_list = ['/user/login']  # 白名单
         path = request.path
-        if request.path not in white_list and not path.startswith('/midea'):
+        if request.path not in white_list and not path.startswith('/media'):
             token = request.META.get("HTTP_AUTHORIZATION")
             print("token:" + str(token))
             try:

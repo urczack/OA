@@ -18,7 +18,7 @@ class SysRole(models.Model):
 
 class SysRoleSerializer(serializers.ModelSerializer):
     class Meta:
-        model = 'SysRole'
+        model = 'sys_role'
         fields = '__all__'
 
 

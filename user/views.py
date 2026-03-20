@@ -3,10 +3,27 @@ from django.shortcuts import render
 from django.views import View
 from rest_framework_jwt.settings import api_settings
 
+from menu.models import SysMenu, SysMenuSerializer
+from role.models import SysRole
 from user.models import SysUser, SysUserSerializer
 
 
 class LoginView(View):
+
+    def biuldTreeMenu(self, sysMenuList):
+        resultMenuList: list[SysMenu] = list()
+        for menu in sysMenuList:
+            # 寻找子节点
+            for e in sysMenuList:
+                if e.parent_id == menu.id:
+                    if not hasattr(menu, 'children'):
+                        menu.children = list()
+                    menu.children.append(e)
+            # 寻找父节点
+            if menu.parent_id == 0:
+                resultMenuList.append(menu)
+        return resultMenuList
+
     def post(self, request):
         username = request.GET.get('username')
         password = request.GET.get('password')
@@ -16,9 +33,33 @@ class LoginView(View):
             jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
             payload = jwt_payload_handler(user)
             token = jwt_encode_handler(payload)
+
+            roleList = SysRole.objects.raw(
+                "SELECT id,name from sys_role where id in (SELECT role_id from sys_user_role where user_id = " + str(
+                    user.id) + ")")
+            print(roleList)
+            MenuSet: set[SysMenu] = set()
+            for row in roleList:
+                menuList = SysMenu.objects.raw(
+                    "select * from sys_menu where id in (SELECT menu_id from sys_role_menu where role_id =" + str(
+                        row.id) + " )")
+                for row2 in menuList:
+                    print(row2.id, row2.name)
+                    MenuSet.add(row2)
+            MenuList: list[SysMenu] = list(MenuSet)  # set转list
+            sorted_menuList = sorted(MenuList)  # 排序
+            # print(sorted_menuList)
+            # 构造菜单树
+            sysMenuList: list[SysMenu] = self.biuldTreeMenu(sorted_menuList)
+            print(sysMenuList)
+            serializerMenuList = list()
+            for sysMenu in sysMenuList:
+                serializerMenuList.append(SysMenuSerializer(sysMenu).data)
+
         except Exception as e:
             return JsonResponse({'code': 500, 'info': '账号或密码错误'})
-        return JsonResponse({'code': 200, 'user': SysUserSerializer(user).data, 'token': token, 'info': 'OK'})
+        return JsonResponse({'code': 200, 'user': SysUserSerializer(user).data, 'token': token, 'info': 'OK',
+                             "menuList": serializerMenuList})
 
 
 # Create your views here.

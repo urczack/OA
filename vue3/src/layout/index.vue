@@ -2,14 +2,14 @@
   <div class="app-wrapper">
     <el-container>
       <el-aside width="200px" class="sidebar-container">
-        <Tabs/>
+        <Menu/>
       </el-aside>
       <el-container>
         <el-header>
           <Header/>
         </el-header>
         <el-main>
-          <Menu/>
+          <Tabs/>
         </el-main>
         <el-footer>
           <Footer/>

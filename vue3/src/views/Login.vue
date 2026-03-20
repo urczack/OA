@@ -85,7 +85,8 @@ const handlerLogin = () => {
       if (data.code == 200) {
         ElMessage.success('登陆成功！')
         window.sessionStorage.setItem("token", data.token);
-        window.sessionStorage.setItem("user", JSON.stringify(data.user))
+        window.sessionStorage.setItem("currentUser", JSON.stringify(data.user))
+        window.sessionStorage.setItem("menuList", JSON.stringify(data.menuList))
         if (LoginForm.value.rememberMe) {
           Cookies.set("username", LoginForm.value.username, {expires: 30})
           Cookies.set('password', encrypt(LoginForm.value.password), {expires: 30})
