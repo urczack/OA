@@ -86,13 +86,21 @@ WSGI_APPLICATION = "OA.wsgi.application"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
+    # "default": {
+    #     "ENGINE": "django.db.backends.mysql",
+    #     "NAME": "oa",
+    #     "USER": "root",
+    #     "PASSWORD": "123456",
+    #     "HOST": "localhost",
+    #     "PORT": "3306"
+    # }
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": "oa",
-        "USER": "root",
-        "PASSWORD": "123456",
-        "HOST": "localhost",
-        "PORT": "3306"
+        "NAME": "django_demo_oa",
+        "USER": "zackurc",
+        "PASSWORD": "hXcZBYOBKDRQ3ssb",
+        "HOST": "mysql6.sqlpub.com",
+        "PORT": "3311"
     }
 }
 

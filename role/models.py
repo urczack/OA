@@ -13,7 +13,7 @@ class SysRole(models.Model):
     remark = models.CharField(max_length=500, null=True, verbose_name='备注')
 
     class Meta:
-        db_table = 'SysRole'
+        db_table = 'sys_role'
 
 
 class SysRoleSerializer(serializers.ModelSerializer):

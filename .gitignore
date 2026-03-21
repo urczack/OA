@@ -1,2 +1,4 @@
 migrations/
 __pycache__/
+requirements.txt
+.vscode/

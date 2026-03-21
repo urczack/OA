@@ -5,6 +5,7 @@
       class="el-menu-vertical-demo"
       text-color="#fff"
       :default-active="'/index'"
+      router
       @open="handleOpen"
       @close="handleClose"
   >
