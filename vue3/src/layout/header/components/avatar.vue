@@ -10,7 +10,9 @@
     </span>
     <template #dropdown>
       <el-dropdown-menu>
-        <el-dropdown-item>个人中心</el-dropdown-item>
+        <el-dropdown-item>
+          <router-link :to="{name:'个人中心'}">个人中心</router-link>
+        </el-dropdown-item>
         <el-dropdown-item @click="logOut">安全退出</el-dropdown-item>
       </el-dropdown-menu>
     </template>

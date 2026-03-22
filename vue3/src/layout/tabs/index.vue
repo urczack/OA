@@ -20,6 +20,7 @@
 import {ref, watch} from 'vue'
 import store from '@/store'
 import {useRouter} from 'vue-router'
+
 const router = useRouter()
 
 const editableTabsValue = ref(store.state.editableTabsValue)
@@ -42,11 +43,12 @@ const removeTab = (targetName) => {
   editableTabs.value = tabs.filter((tab) => tab.name !== targetName)
   store.state.editableTabsValue = editableTabsValue.value
   store.state.editableTabs = editableTabs.value
+  router.push({path: activeName})
 }
 
-const clickTab=(target)=>{
+const clickTab = (target) => {
   console.log(target.props.label)
-  router.push({name:target.props.label})
+  router.push({name: target.props.label})
 }
 
 const refresh = () => {

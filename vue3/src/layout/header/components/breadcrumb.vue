@@ -1,19 +1,29 @@
 <template>
   <el-icon>
-  <HomeFilled/>
+    <HomeFilled/>
   </el-icon>
   <el-breadcrumb separator="/">
-    <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-    <el-breadcrumb-item>
-      <a href="/">promotion management</a>
-    </el-breadcrumb-item>
-    <el-breadcrumb-item>promotion list</el-breadcrumb-item>
-    <el-breadcrumb-item>promotion detail</el-breadcrumb-item>
+    <el-breadcrumb-item v-for="(item,index) in breadcrumbList">{{ item.name }}</el-breadcrumb-item>
   </el-breadcrumb>
 </template>
 
 <script setup>
 import {HomeFilled} from '@element-plus/icons-vue'
+import {ref, watch} from 'vue'
+import {useRoute} from 'vue-router'
+
+const route = useRoute()
+
+const breadcrumbList = ref([])
+
+const initBreadcrumbList = () => {
+  breadcrumbList.value = route.matched;
+}
+
+watch(route, () => {
+  initBreadcrumbList()
+})
+initBreadcrumbList()
 
 </script>
 
