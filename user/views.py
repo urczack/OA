@@ -6,6 +6,8 @@ from rest_framework_jwt.settings import api_settings
 from menu.models import SysMenu, SysMenuSerializer
 from role.models import SysRole
 from user.models import SysUser, SysUserSerializer
+import json
+import datetime
 
 
 class LoginView(View):
@@ -60,34 +62,48 @@ class LoginView(View):
         except Exception as e:
             return JsonResponse({'code': 500, 'info': '账号或密码错误'})
         return JsonResponse({'code': 200, 'user': SysUserSerializer(user).data, 'token': token, 'info': 'OK',
-                             "menuList": serializerMenuList,"role":roles})
+                             "menuList": serializerMenuList, "role": roles})
 
 
 class UserInfoUpdateView(View):
     def post(self, request):
         try:
-            username = request.POST.get('username')
-            phonenumber = request.POST.get('phonenumber')
-            email = request.POST.get('email')
-            
-            # 获取当前用户（从token中解析）
-            token = request.META.get('HTTP_AUTHORIZATION')
-            jwt_decode_handler = api_settings.JWT_DECODE_HANDLER
-            payload = jwt_decode_handler(token)
-            user_id = payload.get('user_id')
-            
-            # 更新用户信息
-            user = SysUser.objects.get(id=user_id)
-            if phonenumber:
-                user.phonenumber = phonenumber
-            if email:
-                user.email = email
-            user.save()
-            
-            return JsonResponse({'code': 200, 'info': '更新成功'})
-        except Exception as e:
-            return JsonResponse({'code': 500, 'info': str(e)})
+            data = json.loads(request.body.decode("utf-8"))
+            print("=== 第一步：接收的原始数据 ===")
+            print(f"数据内容：{data}")
+            print(f"data['id'] 的值：{data.get('id')}")
+            print(f"data['id'] 的类型：{type(data.get('id'))}")  # 重点看类型（字符串/数字）
 
+            # 校验id（转为整数，避免字符串id导致判断错误）
+            user_id = int(data.get('id', -1))
+            print(f"=== 第二步：转换后的用户ID ===")
+            print(f"转换后id：{user_id}，是否等于-1：{user_id == -1}")
+
+            if user_id == -1:  # 新增
+                print("=== 第三步：走【新增】分支，未执行修改逻辑 ===")
+                pass
+            else:  # 修改
+                print("=== 第三步：走【修改】分支 ===")
+                obj_sysUser = SysUser.objects.get(id=user_id)
+                print(f"找到用户：ID={obj_sysUser.id}，原手机号={obj_sysUser.phonenumber}，原邮箱={obj_sysUser.email}")
+
+                # 赋值字段
+                obj_sysUser.phonenumber = data['phonenumber']
+                obj_sysUser.email = data['email']
+                print(f"赋值后：新手机号={obj_sysUser.phonenumber}，新邮箱={obj_sysUser.email}")
+
+                # 保存并打印保存后的状态
+                obj_sysUser.save()
+                print("=== 第四步：执行save()完成 ===")
+
+                # 保存后立即重新查询，验证是否写入数据库
+                updated_user = SysUser.objects.get(id=user_id)
+                print(f"重新查询验证：数据库中手机号={updated_user.phonenumber}，邮箱={updated_user.email}")
+
+            return JsonResponse({'code': 200, 'info': 'OK'})
+        except Exception as e:
+            print(f"隐藏异常：{str(e)}")  # 兜底捕获所有可能的静默异常
+            return JsonResponse({'code': 500, 'info': f'错误：{str(e)}'})
 
 
 # Create your views here.

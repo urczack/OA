@@ -1,4 +1,4 @@
-import {createRouter, createWebHashHistory} from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 
 
 const routes = [
@@ -11,7 +11,7 @@ const routes = [
         path: '/',
         name: '主页',
         component: () => import('../layout/index.vue'),
-        redirect: '/index',
+        // redirect: '/index',
         children: [
             {
                 path: '/index',

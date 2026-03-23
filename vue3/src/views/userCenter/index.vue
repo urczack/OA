@@ -123,6 +123,10 @@
 
 <script>
 import request,{getServerUrl} from '@/util/request';
+import { ref } from 'vue';
+import { ElMessage } from 'element-plus';
+
+
 
 export default {
   name: 'UserCenter',
@@ -193,8 +197,6 @@ export default {
       if (currentUserStr) {
         const userData = JSON.parse(currentUserStr);
         this.avatarUrl = getServerUrl()+'/media/userAvatar/'+userData.avatar || '';
-        // 将remark字段映射为role，因为模板中使用的是role
-        userData.role = userData.remark || '未设置';
         return { data: userData };
       } else {
         // 如果sessionStorage中没有数据，返回默认数据
@@ -272,6 +274,15 @@ export default {
     
     // 保存用户信息
     async handleSaveUserInfo() {
+      // const form = ref({
+      //   id:'-1',
+      //   phonenumber:'',
+      //   email:''
+      // })
+      // const userRef = ref([])
+      // form.value = props.userForm
+        
+
       // 表单验证
       this.$refs.userFormRef.validate(async (valid) => {
         if (valid) {
@@ -287,13 +298,13 @@ export default {
               // 更新sessionStorage
               sessionStorage.setItem('currentUser', JSON.stringify(this.currentUser));
               
-              this.$message.success('保存成功');
+              ElMessage.success('保存成功');
             } else {
-              this.$message.error('保存失败: ' + response.data.info);
+              ElMessage.error('保存失败: ' + response.data.info);
             }
           } catch (error) {
             console.error('保存用户信息失败:', error);
-            this.$message.error('保存失败，请重试');
+            ElMessage.error('保存失败，请重试');
           } finally {
             this.loading = false;
           }

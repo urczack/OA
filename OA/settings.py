@@ -87,22 +87,22 @@ WSGI_APPLICATION = "OA.wsgi.application"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    # "default": {
-    #     "ENGINE": "django.db.backends.mysql",
-    #     "NAME": "oa",
-    #     "USER": "root",
-    #     "PASSWORD": "123456",
-    #     "HOST": "localhost",
-    #     "PORT": "3306"
-    # }
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": "django_demo_oa",
-        "USER": "zackurc",
-        "PASSWORD": "hXcZBYOBKDRQ3ssb",
-        "HOST": "mysql6.sqlpub.com",
-        "PORT": "3311"
+        "NAME": "oa",
+        "USER": "root",
+        "PASSWORD": "123456",
+        "HOST": "localhost",
+        "PORT": "3306"
     }
+    # "default": {
+    #     "ENGINE": "django.db.backends.mysql",
+    #     "NAME": "django_demo_oa",
+    #     "USER": "zackurc",
+    #     "PASSWORD": "hXcZBYOBKDRQ3ssb",
+    #     "HOST": "mysql6.sqlpub.com",
+    #     "PORT": "3311"
+    # }
 }
 
 # Password validation
@@ -149,6 +149,7 @@ MEDIA_URL = 'media/'
 
 # JWT配置
 import datetime
+
 JWT_AUTH = {
     'JWT_EXPIRATION_DELTA': datetime.timedelta(days=7),  # 设置token过期时间为7天
     'JWT_ALLOW_REFRESH': True,  # 允许刷新token
