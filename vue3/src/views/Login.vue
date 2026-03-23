@@ -84,6 +84,8 @@ const handlerLogin = () => {
       let data = result.data;
       if (data.code == 200) {
         ElMessage.success('登陆成功！')
+        console.log(data.user)
+        data.user.role = data.role
         window.sessionStorage.setItem("token", data.token);
         window.sessionStorage.setItem("currentUser", JSON.stringify(data.user))
         window.sessionStorage.setItem("menuList", JSON.stringify(data.menuList))

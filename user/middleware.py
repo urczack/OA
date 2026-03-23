@@ -6,13 +6,13 @@ from rest_framework_jwt.settings import api_settings
 from jwt import ExpiredSignatureError, InvalidTokenError, PyJWTError
 
 
-class JwtAuthticationMiddlewate(MiddlewareMixin):
+class JwtAuthenticationMiddleware(MiddlewareMixin):
 
     def process_request(self, request):
         white_list = ['/user/login']  # 白名单
         path = request.path
         if request.path not in white_list and not path.startswith('/media'):
-            token = request.META.get("HTTP_AUTHORIZATION")
+            token = 'Bearer '+request.META.get("HTTP_AUTHORIZATION")
             print("token:" + str(token))
             try:
                 jwt_decode_handler = api_settings.JWT_DECODE_HANDLER
