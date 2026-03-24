@@ -27,8 +27,12 @@ class LoginView(View):
         return resultMenuList
 
     def post(self, request):
-        username = request.GET.get('username')
-        password = request.GET.get('password')
+        # username = request.GET.get('username')
+        # password = request.GET.get('password')
+        data = json.loads(request.body.decode("utf-8"))
+        username = data['username']
+        password = data['password']
+        print(username, password)
         try:
             user = SysUser.objects.get(username=username, password=password)
             jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
@@ -69,28 +73,15 @@ class UserInfoUpdateView(View):
     def post(self, request):
         try:
             data = json.loads(request.body.decode("utf-8"))
-            print("=== 第一步：接收的原始数据 ===")
-            print(f"数据内容：{data}")
-            print(f"data['id'] 的值：{data.get('id')}")
-            print(f"data['id'] 的类型：{type(data.get('id'))}")  # 重点看类型（字符串/数字）
-
             # 校验id（转为整数，避免字符串id导致判断错误）
             user_id = int(data.get('id', -1))
-            print(f"=== 第二步：转换后的用户ID ===")
-            print(f"转换后id：{user_id}，是否等于-1：{user_id == -1}")
-
             if user_id == -1:  # 新增
-                print("=== 第三步：走【新增】分支，未执行修改逻辑 ===")
                 pass
             else:  # 修改
-                print("=== 第三步：走【修改】分支 ===")
                 obj_sysUser = SysUser.objects.get(id=user_id)
-                print(f"找到用户：ID={obj_sysUser.id}，原手机号={obj_sysUser.phonenumber}，原邮箱={obj_sysUser.email}")
-
                 # 赋值字段
                 obj_sysUser.phonenumber = data['phonenumber']
                 obj_sysUser.email = data['email']
-                print(f"赋值后：新手机号={obj_sysUser.phonenumber}，新邮箱={obj_sysUser.email}")
 
                 # 保存并打印保存后的状态
                 obj_sysUser.save()
@@ -104,6 +95,25 @@ class UserInfoUpdateView(View):
         except Exception as e:
             print(f"隐藏异常：{str(e)}")  # 兜底捕获所有可能的静默异常
             return JsonResponse({'code': 500, 'info': f'错误：{str(e)}'})
+
+class PwdModifyView(View):
+    def post(self, request):
+        try: 
+            data = json.loads(request.body.decode("utf-8"))
+            print(data) #{"oldPassword":"123","newPassword":"123456","confirmPassword":"123456","id":1}
+            obj_user = SysUser.objects.get(id=int(data['id']))
+            print(obj_user)
+            if obj_user.password == data['oldPassword']:
+                if obj_user.password == data['newPassword']:
+                    return JsonResponse({'code':400, 'info': '新密码不能与旧密码相同'})
+                obj_user.password = data['newPassword']
+                obj_user.update_time = datetime.datetime.now().date()
+                obj_user.save()
+            else:
+                return JsonResponse({'code':400, 'info': '旧密码错误'})
+        except Exception as e:
+            return JsonResponse({'code':400, 'info': f'错误：{str(e)}'})
+        return JsonResponse({'code': 200, 'info': 'OK'})
 
 
 # Create your views here.

@@ -274,15 +274,6 @@ export default {
     
     // 保存用户信息
     async handleSaveUserInfo() {
-      // const form = ref({
-      //   id:'-1',
-      //   phonenumber:'',
-      //   email:''
-      // })
-      // const userRef = ref([])
-      // form.value = props.userForm
-        
-
       // 表单验证
       this.$refs.userFormRef.validate(async (valid) => {
         if (valid) {
@@ -322,17 +313,18 @@ export default {
           this.loading = true;
           try {
             // 实际项目中替换为真实API
-            const response = await request.post('/user/change-password', this.pwdForm);
+            this.pwdForm.id = this.currentUser.id;
+            const response = await request.post('/user/pwd_modify', this.pwdForm);
             
             if (response.data.code === 200) {
-              this.$message.success('密码修改成功');
+              ElMessage.success('密码修改成功');
               this.resetPwdForm();
             } else {
-              this.$message.error('密码修改失败: ' + response.data.info);
+              ElMessage.error('密码修改失败: ' + response.data.info);
             }
           } catch (error) {
             console.error('修改密码失败:', error);
-            this.$message.error('修改密码失败，请重试');
+            ElMessage.error('修改密码失败，请重试');
           } finally {
             this.loading = false;
           }

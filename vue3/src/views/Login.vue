@@ -79,7 +79,7 @@ const loginRules = {
 const handlerLogin = () => {
   loginRef.value.validate(async (valid) => {
     if (valid) {
-      const result = await requestUtil.post('/user/login?' + qs.stringify(LoginForm.value))
+      const result = await requestUtil.post('/user/login?', LoginForm.value)
       //console.log(result)
       let data = result.data;
       if (data.code == 200) {
@@ -98,7 +98,7 @@ const handlerLogin = () => {
           Cookies.remove("password")
           Cookies.remove("rememberMe")
         }
-        router.replace('/')
+        router.replace('/index')
       } else {
         ElMessage.error(data.info);
       }
