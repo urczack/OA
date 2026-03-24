@@ -1,8 +1,11 @@
+from django.core import paginator
+from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.views import View
 from rest_framework_jwt.settings import api_settings
 
+from OA import settings
 from menu.models import SysMenu, SysMenuSerializer
 from role.models import SysRole
 from user.models import SysUser, SysUserSerializer
@@ -96,24 +99,69 @@ class UserInfoUpdateView(View):
             print(f"隐藏异常：{str(e)}")  # 兜底捕获所有可能的静默异常
             return JsonResponse({'code': 500, 'info': f'错误：{str(e)}'})
 
+
 class PwdModifyView(View):
     def post(self, request):
-        try: 
+        try:
             data = json.loads(request.body.decode("utf-8"))
-            print(data) #{"oldPassword":"123","newPassword":"123456","confirmPassword":"123456","id":1}
+            print(data)  # {"oldPassword":"123","newPassword":"123456","confirmPassword":"123456","id":1}
             obj_user = SysUser.objects.get(id=int(data['id']))
             print(obj_user)
             if obj_user.password == data['oldPassword']:
                 if obj_user.password == data['newPassword']:
-                    return JsonResponse({'code':400, 'info': '新密码不能与旧密码相同'})
+                    return JsonResponse({'code': 400, 'info': '新密码不能与旧密码相同'})
                 obj_user.password = data['newPassword']
                 obj_user.update_time = datetime.datetime.now().date()
                 obj_user.save()
             else:
-                return JsonResponse({'code':400, 'info': '旧密码错误'})
+                return JsonResponse({'code': 400, 'info': '旧密码错误'})
         except Exception as e:
-            return JsonResponse({'code':400, 'info': f'错误：{str(e)}'})
+            return JsonResponse({'code': 400, 'info': f'错误：{str(e)}'})
         return JsonResponse({'code': 200, 'info': 'OK'})
+
+
+class ImageView(View):
+    def post(self, request):
+        file = request.FILES.get('avatar')
+        print("file:", file)
+        if file:
+            file_name = file.name
+            suffixName = file_name[file_name.rfind("."):]
+            new_file_name = datetime.datetime.now().strftime('%Y%m%d%H%M%S') + suffixName
+            file_path = str(settings.MEDIA_ROOT) + "\\userAvatar\\" + new_file_name
+            print("file_path:", file_path)
+            try:
+                with open(file_path, 'wb') as f:
+                    for chunk in file.chunks():
+                        f.write(chunk)
+                        return JsonResponse({'code': 200, 'title': new_file_name})
+            except:
+                return JsonResponse({'code': 500, 'errorInfo': '上传头像失败'})
+
+
+class AvatarView(View):
+    def post(self, request):
+        data = json.loads(request.body.decode("utf-8"))
+        print(data)
+        id = data['id']
+        avatar = data['avatar']
+        obj_user = SysUser.objects.get(id=id)
+        obj_user.avatar = avatar
+        obj_user.save()
+        return JsonResponse({'code': 200, 'newPickName': avatar})
+
+
+class SearchView(View):
+    def post(self, request):
+        data = json.loads(request.body.decode('utf-8'))
+        pageNum = data['pageNum']
+        pageSize = data['pageSize']
+        print(pageSize, pageNum)
+        UserList = Paginator(SysUser.objects.all(), pageSize).page(pageNum)
+        obj_user = UserList.object_list.values()
+        users = list(obj_user)
+        total = SysUser.objects.count()
+        return JsonResponse({'code': 200, 'userList': users, 'total': total})
 
 
 # Create your views here.
