@@ -156,11 +156,24 @@ class SearchView(View):
         data = json.loads(request.body.decode('utf-8'))
         pageNum = data['pageNum']
         pageSize = data['pageSize']
+        query = data['query']
         print(pageSize, pageNum)
-        UserList = Paginator(SysUser.objects.all(), pageSize).page(pageNum)
+        UserList = Paginator(SysUser.objects.filter(username__icontains=query), pageSize).page(pageNum)
         obj_user = UserList.object_list.values()
         users = list(obj_user)
-        total = SysUser.objects.count()
+        for user in users:
+            userId = user['id']
+            roleList = SysUser.objects.raw(
+                "SELECT id,name FROM sys_role WHERE id IN (SELECT role_id FROM sys_user_role WHERE user_id=" + str(
+                    userId) + ")")
+            roleListDict = []
+            for role in roleList:
+                roleDict = {}
+                roleDict['id'] = role.id
+                roleDict['name'] = role.name
+                roleListDict.append(roleDict)
+            user['roleList'] = roleListDict
+        total = SysUser.objects.filter(username__icontains=query).count()
         return JsonResponse({'code': 200, 'userList': users, 'total': total})
 
 
